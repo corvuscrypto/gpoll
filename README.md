@@ -32,7 +32,7 @@ http.ListenAndServe(":8080",nil)
 And it's as easy as that!!
 
 ## The ONE rule
-If you are using this package, the one rule that keeps this server ticking is that you must keep track of the client id's on the front end. This is actually not a bad thing, but the gpoll package expects to receive a query with at least the following query: 
+If you are using this package, the one rule that keeps this server ticking is that you must keep track of the uuid the server sends back after initializing the polling connection. This is actually not a bad thing since in most cases it is good to track your clients anonymously, but before allowing the poll to go through properly the gpoll package always expects a query with at least the following query: 
 `?client-id=x$xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
 
 ### Why?
