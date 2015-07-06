@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+    <script>
+      var username=''
+      var uuid = 0;
+      $(document).ready(function(){
+        $("#mainChat").hide();
+        $("#msgInput").hide();
+        $("#msgSubmit").hide();
+        $("#msgInput").keydown(function(evt){
+
+          if(evt.which === 13){
+
+            $("#msgSubmit").click();
+            evt.preventDefault();
+          }
+
+        });
+        $("#userIn").keydown(function(evt){
+
+          if(evt.which === 13){
+
+            $("#enterSubmit").click();
+            evt.preventDefault();
+          }
+
+        });
+        poll();
+
+      });
+
+      function poll(){
+
+
+        var xhr = $.ajax({
+          url: "/goPoll?client-id="+uuid
+        });
+
+        xhr.then(function(data){
+
+          var stuff = JSON.parse(data);
+
+          if(stuff["client-id"]){
+            uuid = stuff["client-id"]
+          }
+
+          if(stuff.msg){
+            var cn = 'usern';
+            var mn = 'mess';
+            if (stuff.user===username) {
+              cn = 'userme';
+              mn = 'messme';
+            }
+            $("#mainChat").append("<span class="+mn+"><span class="+cn+">"+stuff.user+": </span><span class='content'>"+stuff.msg+"</span></span>");
+            $("#mainChat").scrollTop($('#mainChat')[0].scrollHeight);
+          }
+
+          poll();
+
+        });
+
+      }
+
+      function send(msg) {
+
+        var xhr = $.ajax({
+          url: "/send?msg="+msg+"&user="+username
+        });
+
+        xhr.error(function(err){alert(err);});
+
+      }
+
+      function enter(st){
+        st = st.trim();
+        if(st.length>0){
+        username = st;
+        $("#userIn").fadeOut();
+        $("#usLab").fadeOut();
+        $("#enterSubmit").fadeOut();
+        $("#mainChat").fadeIn();
+        $("#msgSubmit").fadeIn();
+        $("#msgInput").fadeIn();
+      } else {
+
+        alert("Username can't be blank")
+
+      }
+
+      }
+
+      function sMsg(str){
+        send(str);
+        $("#msgInput").val('');
+
+      }
+
+    </script>
+    <style>
+      body {
+        margin: 0;
+        background: #21252b;
+        color: #6b727d;
+        font-family: Helvetica,sans-serif;
+
+      }
+      label {
+
+        font-weight: bold;
+
+      }
+      .container{
+
+        width: 40em;
+        height: 500px;
+        margin: 10em auto;
+      }
+
+      .mainCon{
+
+
+      }
+      #mainChat {
+        margin: 0 auto;
+        padding: 10px;
+        width: 40em;
+        height: 30em;
+        border: 1px #485c44 solid;
+        overflow-y: auto;
+        background: #282c34;
+
+      }
+
+      .mess {
+        display: table-row;
+        height: 2em;
+        width:100%;
+        vertical-align: middle;
+        background: #30343c;
+      }
+      .messme {
+        display: table-row;
+        height: 2em;
+        width:100%;
+
+        vertical-align: middle;
+      }
+
+      .usern{
+        text-align: right;
+        vertical-align: top;
+
+        display:table-cell;
+        width:50px;
+        padding: 0.5em 10px 0 10px;
+        color: #73c990;
+
+      }
+      .userme{
+        vertical-align: top;
+        text-align: right;
+        padding: 0.5em 10px 0 10px;
+        display:table-cell;
+        width:50px;
+        color: #7390c9;
+      }
+      .content{
+        text-align: left;
+        display:table-cell;
+        width: 100%;
+        padding-top:0.5em;
+        vertical-align: top;
+      }
+
+      input[type="text"],textarea {
+
+        color: #ccc;
+        background: #282c34;
+        height:1.75em;
+        border:1px #383c44 solid;
+        font-family: sans-serif;
+      }
+
+      textarea{
+        width:40em;
+        height:3em;
+        resize: none;
+        float:left;
+      }
+
+      input[type="submit"]{
+
+        background: #333;
+        height: 3.5em;
+        width: 6em;
+        margin-left: 0.5em;
+        border:1px #444 solid;
+        color: #6b727d;
+        font-family: Helvetica,sans-serif;
+        float:right;
+        text-rendering: optimizeLegibility;
+
+      }
+      input[type="button"]{
+
+        background: #333;
+        height: 2em;
+        width: 6em;
+        margin-left: 0.5em;
+        border:1px #444 solid;
+        color: #6b727d;
+        font-family: Helvetica,sans-serif;
+
+        text-rendering: optimizeLegibility;
+
+      }
+      input[type="submit"]:hover{
+        background: #444;
+      }
+    </style>
+  </head>
+
+  <body>
+
+    <div class="container">
+    <label for="username" id="usLab">Username: <input id="userIn" type="text"></label><input type="button" id="enterSubmit" value="Enter chat" onclick="enter(userIn.value);">
+    <br><br>
+    <div class="mainCon">
+    <div id="mainChat">
+    </div>
+  </div>
+    <br>
+
+      <textarea id="msgInput"></textarea>
+      <input type="submit" id="msgSubmit" value="Send" onClick="sMsg(msgInput.value)"/>
+
+  </div>
+  </body>
+</html>
