@@ -27,7 +27,7 @@ func sendMess(w http.ResponseWriter, r *http.Request){
 
 func servePage(w http.ResponseWriter, r *http.Request){
 
-  http.ServeFile(w, r, "C:/Users/Cliff/Documents/Go Projects/gpoll/index.html")
+  http.ServeFile(w, r, "/path/to/example/index.html")
 
 }
 
