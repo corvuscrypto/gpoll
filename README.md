@@ -36,7 +36,7 @@ If you are using this package, the one rule that keeps this server ticking is th
 `?client-id=x$xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
 
 ### Why?
-The gpoll package uses this to maintain its routines and retrieve the proper channels to listen for messages. If you send an improper id, then you will receive an Error 417 response. **To initiate a client properly so the server returns a uuid to use for subsequent polls, send the following query:**
+The gpoll package uses this to maintain its routines and retrieve the proper channels to listen for messages. If you send an improper id, then you will receive an Error 404 response. **To initiate a client properly so the server returns a uuid to use for subsequent polls, send the following query:**
 `?client-id=0`
 
 ##### if you're into the specifics...
