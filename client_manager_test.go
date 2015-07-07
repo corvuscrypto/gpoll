@@ -7,15 +7,15 @@ import  (
 
 func TestAddClients(t *testing.T){
 
-  b := &Broadcaster{ROUTINE_MAX_CLIENTS: 10}
+  b := &Broadcaster{RoutineMaxClients: 10}
 
   for i:=0; i< 100; i++ {
 
-    b.addClient()
+    b.AddClient()
 
   }
-  if len(b.routines) != 10 {
-    t.Errorf("Test expected 10 routines, but encountered %v!", len(b.routines))
+  if len(b.Routines) != 10 {
+    t.Errorf("Test expected 10 routines, but encountered %v!", len(b.Routines))
   }
 
 }
@@ -34,20 +34,20 @@ func TestUUID(t *testing.T){
 
 func TestGetChannel(t *testing.T){
 
-    b := &Broadcaster{ROUTINE_MAX_CLIENTS: 10}
+    b := &Broadcaster{RoutineMaxClients: 10}
 
     var uids []string
     var tids []int
 
     for i := 0; i<10; i++{
 
-      tuid, ttid := b.addClient()
+      tuid, ttid := b.AddClient()
 
       uids = append(uids, tuid)
       tids = append(tids, ttid)
     }
 
-    ch, err := b.getChannel(uids[1],tids[1])
+    ch, err := b.GetChannel(uids[1],tids[1])
 
 
     if err != nil {
@@ -60,7 +60,7 @@ func TestGetChannel(t *testing.T){
       t.Errorf("Test expected to retrieve channel, but received %v", reflect.TypeOf(ch))
     }
 
-    ch, err = b.getChannel("asd",3)
+    ch, err = b.GetChannel("asd",3)
     if err == nil {
 
       t.Error("An error was expected, but not received")

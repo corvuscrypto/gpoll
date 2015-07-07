@@ -15,13 +15,13 @@ func TestTotalRoutineDump(t *testing.T){
   // tests to ensure that routines get cleaned up when there
   // are no more clients.
 
-  b := &Broadcaster{ROUTINE_MAX_CLIENTS: 10, CLIENT_BUFFER_SIZE:10, ROUTINE_BUFFER_SIZE:10}
+  b := &Broadcaster{RoutineMaxClients: 10, ClientBufferSize:10, RoutineBufferSize:10}
   //test whole dump
-  b.benchmark(1000,10,10)
+  b.Benchmark(1000,10,10)
 
-  if len(b.routines)>0 {
+  if len(b.Routines)>0 {
 
-    t.Errorf("Expected at least 1 routine, detected %v", len(b.routines))
+    t.Errorf("Expected at least 1 routine, detected %v", len(b.Routines))
 
   }
 
@@ -29,9 +29,9 @@ func TestTotalRoutineDump(t *testing.T){
 
 func TestSingleRoutineDump(t *testing.T){
 
-  b := &Broadcaster{ ROUTINE_MAX_CLIENTS:10,
-  CLIENT_BUFFER_SIZE:1,
-  ROUTINE_BUFFER_SIZE:10}
+  b := &Broadcaster{RoutineMaxClients:10,
+                    ClientBufferSize:1,
+                    RoutineBufferSize:10}
 
   //test removal of single routine
   // if the client buffer is 1, it will take 3 sends to clean up.
@@ -41,13 +41,13 @@ func TestSingleRoutineDump(t *testing.T){
   // routine's client array is empty and initiate coroutine termination.
 
   for i:=0; i<10;i++ {
-    b.addClient()
+    b.AddClient()
   }
 
   for i:=0; i<3;i++{
     if i == 1 {
       for j:=0; j<1;j++ {
-        b.addClient()
+        b.AddClient()
       }
     }
     b.Send("test")
@@ -59,34 +59,34 @@ func TestSingleRoutineDump(t *testing.T){
                                      //significantly
   }
 
-  if len(b.routines) != 1 {
-    t.Errorf("Expected 1 routine to be left, detected %v", len(b.routines))
+  if len(b.Routines) != 1 {
+    t.Errorf("Expected 1 routine to be left, detected %v", len(b.Routines))
   }
 
   //then send one more message to ensure that there are 0 after the next send
 
   b.Send("test")
 
-  if len(b.routines) != 0 {
-    t.Errorf("Expected 0 routine to be left, detected %v", len(b.routines))
+  if len(b.Routines) != 0 {
+    t.Errorf("Expected 0 routine to be left, detected %v", len(b.Routines))
   }
 
 }
 
 func TestDefaultSendAndClean(t *testing.T){
 
-  DefaultBroadcaster.addClient()
+  DefaultBroadcaster.AddClient()
   Send("test")
-  if len(DefaultBroadcaster.routines) != 1 {
-    t.Errorf("Expected 1 routine to be left, detected %v",len(DefaultBroadcaster.routines))
+  if len(DefaultBroadcaster.Routines) != 1 {
+    t.Errorf("Expected 1 routine to be left, detected %v",len(DefaultBroadcaster.Routines))
   }
-  for i:=0; i< DefaultBroadcaster.CLIENT_BUFFER_SIZE+2;i++{
+  for i:=0; i< DefaultBroadcaster.ClientBufferSize+2;i++{
     Send("test")
     time.Sleep(1*time.Millisecond)
   }
 
-  if len(DefaultBroadcaster.routines) != 0 {
-    t.Errorf("Expected 0 routine to be left, detected %v",len(DefaultBroadcaster.routines))
+  if len(DefaultBroadcaster.Routines) != 0 {
+    t.Errorf("Expected 0 routine to be left, detected %v",len(DefaultBroadcaster.Routines))
   }
 
 }
@@ -108,7 +108,7 @@ func TestDummyServer(t *testing.T){
     resp.Body.Close()
   }
   //test with custom Broadcaster
-  b := &Broadcaster{ROUTINE_MAX_CLIENTS:10, CLIENT_BUFFER_SIZE:1, ROUTINE_BUFFER_SIZE:10}
+  b := &Broadcaster{RoutineMaxClients:10, ClientBufferSize:1, RoutineBufferSize:10}
   b.ListenAndBroadcast("/poll2")
   b.ListenAndBroadcast("/poll3", http.DefaultServeMux)
   var uuid string
@@ -136,22 +136,22 @@ func TestDummyServer(t *testing.T){
   //ensure that broadcasters don't cross-handle clients
   Send("test")
   resp,_ = http.Get(dummySrv.URL+"/poll1?client-id="+uuid)
-  if resp.StatusCode != 417 {
-    t.Errorf("Expected to find an Error 417 message, but instead received: %v", resp.StatusCode)
+  if resp.StatusCode != 404 {
+    t.Errorf("Expected to find an Error 404 message, but instead received: %v", resp.StatusCode)
   }
 
   //test requests with bad uuid.....
   resp,_ = http.Get(dummySrv.URL+"/poll3?client-id="+uuid[3:])
-  if resp.StatusCode != 417 {
-    t.Errorf("Expected to find an Error 417 message, but instead received: %v", resp.StatusCode)
+  if resp.StatusCode != 404 {
+    t.Errorf("Expected to find an Error 404 message, but instead received: %v", resp.StatusCode)
   }
   resp.Body.Close()
 
 
   //...And now with an un-findable uuid
   resp,_ = http.Get(dummySrv.URL+"/poll3?client-id="+uuid[:len(uuid)-1]+"{")
-  if resp.StatusCode != 417 {
-    t.Errorf("Expected to find an Error 417 message, but instead received: %v", resp.StatusCode)
+  if resp.StatusCode != 404 {
+    t.Errorf("Expected to find an Error 404 message, but instead received: %v", resp.StatusCode)
   }
   resp.Body.Close()
 

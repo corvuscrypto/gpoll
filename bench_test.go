@@ -6,9 +6,9 @@ import (
 
 func TestBenchmark(t *testing.T){
 
-      b := &Broadcaster{ROUTINE_MAX_CLIENTS: 10, CLIENT_BUFFER_SIZE:1, ROUTINE_BUFFER_SIZE:1}
+      b := &Broadcaster{RoutineMaxClients: 10, ClientBufferSize:1, RoutineBufferSize:1}
 
-      err := b.benchmark(1,1,1)
+      err := b.Benchmark(1,1,1)
 
       if err != nil {
 
@@ -16,19 +16,19 @@ func TestBenchmark(t *testing.T){
 
       }
 
-      err = b.benchmark(0,0,0)
+      err = b.Benchmark(0,0,0)
       if err == nil {
         t.Error("Expected an error, functioned returned nil")
       }
-      err = b.benchmark(1,0,0)
+      err = b.Benchmark(1,0,0)
       if err == nil {
         t.Error("Expected an error, functioned returned nil")
       }
-      err = b.benchmark(1,1,0)
+      err = b.Benchmark(1,1,0)
       if err == nil {
         t.Error("Expected an error, functioned returned nil")
       }
-      err = b.benchmark(1,1,2)
+      err = b.Benchmark(1,1,2)
       if err == nil {
         t.Error("Expected an error, functioned returned nil")
       }

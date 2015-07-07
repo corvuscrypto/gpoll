@@ -6,61 +6,62 @@ import (
 		"time"
 		)
 
-//###### TESTING FUNCTIONS ######
-
-func (b *Broadcaster) benchmark(size int, load int, quant int) error{
-	if size <= 0 {
-		return errors.New("'size' variable in *Broadcaster.benchmark(size, load, quant) is not allowed to be negative or 0")
+// Benchmark registers virtual clients and tests the server by sending messages of size 'msgSize'
+// to all of them. The data is collected automatically and some basic statistics are output.
+// This only looks at time, but may look at memory usage in the future.
+func (b *Broadcaster) Benchmark(msgSize int, clients int, numMsgs int) error{
+	if msgSize <= 0 {
+		return errors.New("'msgSize' is not allowed to be negative or 0")
 	}
-	if load <= 0 {
-		return errors.New("'load' variable in *Broadcaster.benchmark(size, load, quant) is not allowed to be negative or 0")
+	if clients <= 0 {
+		return errors.New("'clients' is not allowed to be negative or 0")
 	}
-	if quant <= 0 {
-		return errors.New("'quant' variable in *Broadcaster.benchmark(size, load, quant) is not allowed to be negative or 0")
+	if numMsgs <= 0 {
+		return errors.New("'numMsgs' is not allowed to be negative or 0")
 	}
-	if quant > b.CLIENT_BUFFER_SIZE {
-		return errors.New("The number of messages ('quant') you are benchmarking with must be less than or equal to client buffer size.")
+	if numMsgs > b.ClientBufferSize {
+		return errors.New("numMsgs must be less than or equal to client buffer size.")
 	}
 	fmt.Println("Benchmarking server...")
-	b.isBenchmarking = true
-	var testMessage string = string(make([]byte, size))
+	b.IsBenchmarking = true
+	var testMessage string = string(make([]byte, msgSize))
 	nT := new(Routine)
-	nT.Pipe = make(chan string,b.ROUTINE_BUFFER_SIZE)
-	b.routines = append(b.routines, *nT)
-	go b.handleMessage(nT.Pipe, len(b.routines))
-	fmt.Printf("\nTesting with %d clients...\n", load)
+	nT.Pipe = make(chan string,b.RoutineBufferSize)
+	b.Routines = append(b.Routines, *nT)
+	go b.HandleMessage(nT.Pipe, len(b.Routines))
+	fmt.Printf("\nTesting with %d clients...\n", clients)
 
-	for i := 0; i < load; i++ {
-		b.addClient()
+	for i := 0; i < clients; i++ {
+		b.AddClient()
 	}
 	testTime := time.Now()
-	for i:=0; i<quant;i++{
-		for _,t := range b.routines{
-			b.wg.Add(1)
+	for i:=0; i<numMsgs;i++{
+		for _,t := range b.Routines{
+			b.WG.Add(1)
 			t.Pipe <- testMessage
 		}
-			b.wg.Wait()
+			b.WG.Wait()
 	}
 
 
 	finishTime := time.Since(testTime).Nanoseconds()
-	b.isBenchmarking = false
-	fmt.Printf("Broadcast of %d messages to %d clients finished in %d ns!\n", quant, load, finishTime)
+	b.IsBenchmarking = false
+	fmt.Printf("Broadcast of %d messages to %d clients finished in %d ns!\n", numMsgs, clients, finishTime)
 	if b.CSalt == "" {
 		b.CSalt = UUID()
 	}
-	for _,t := range b.routines {
-		b.wg.Add(1)
+	for _,t := range b.Routines {
+		b.WG.Add(1)
 		t.Pipe <- "quit" + b.CSalt
 	}
-	b.wg.Wait()
-	b.routines = nil
+	b.WG.Wait()
+	b.Routines = nil
 
 
 	var averageLag int64 = 0
 	var maxLag int64 = 0
 	var minLag int64 = 0
-	for _,d := range b.benchData {
+	for _,d := range b.BenchData {
 
 		averageLag += d.Ns
 		if d.Ns > maxLag || maxLag == 0 {
@@ -71,7 +72,7 @@ func (b *Broadcaster) benchmark(size int, load int, quant int) error{
 		}
 
 	}
-	averageLag /= int64(len(b.benchData))
+	averageLag /= int64(len(b.BenchData))
 	fmt.Printf("_________________\n\n Test Summary\n_________________"+
 				"\n\n   Min. Latency: %d ns\n   Average Latency: %d ns\n   Max Latency: %d ns\n\n",
 				minLag, averageLag, maxLag)
