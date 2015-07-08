@@ -1,7 +1,7 @@
 # gpoll
 Long-polling server package for Go. Meant to be generic enough to work with any server generated with go. Features automated client management and coroutine (goroutine) generation and termination based on default or custom settings so you can optimize your long-polling application.
 ## Documentation
-Still writing this. GoDocs will be available soon as well as some basic stuff here on GitHub.com
+GoDoc available at http://godoc.org/github.com/corvuscrypto/gpoll
 
 A basic example of starting a server is:
 
@@ -15,17 +15,22 @@ import  (
 
 func HandleMessage(w http.ResponseWriter, r *http.Request) {
 
-//code to detect message and do other stuff as you please with the request.
-
-//send the message ('msg'); type string
-gpoll.Send(msg)
+        /* code to detect message and do other stuff as 
+           you please with the request. */
+           
+        var message string = "blah blah blah"
+           
+        gpoll.Send(msg) //send the message string
+        
+        w.WriteHeader(200)
+        
 }
 
 func main(){
 
-gpoll.ListenAndBroadcast("/path/to/listen/on")
-http.HandleFunc("/send", HandleMessage)
-http.ListenAndServe(":8080",nil)
+        gpoll.ListenAndBroadcast("/path/to/listen/on")
+        http.HandleFunc("/send", HandleMessage)
+        http.ListenAndServe(":8080",nil)
 
 }
 ```
