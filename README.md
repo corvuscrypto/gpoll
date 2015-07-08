@@ -18,7 +18,7 @@ func HandleMessage(w http.ResponseWriter, r *http.Request) {
         /* code to detect message and do other stuff as 
            you please with the request. */
            
-        var message string = "blah blah blah"
+        var msg string = "blah blah blah"
            
         gpoll.Send(msg) //send the message string
         
