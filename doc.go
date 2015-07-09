@@ -2,7 +2,7 @@
 // can be found in the License file.
 
 /*
-The gpoll package manages long-polling. Long-polling is a means of near-realtime
+Package gpoll manages long-polling. Long-polling is a means of near-realtime
 data transfer that utilizes keep-alive requests to allow clients to receive data
 as it becomes available. Notable uses for long-polling include push notification
 and chat clients.
