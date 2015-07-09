@@ -1,7 +1,7 @@
 # gpoll
 Long-polling server package for Go. Meant to be generic enough to work with any server generated with go. Features automated client management and coroutine (goroutine) generation and termination based on default or custom settings so you can optimize your long-polling application.
 ## Documentation
-Still writing this. GoDocs will be available soon as well as some basic stuff here on GitHub.com
+GoDoc available at http://godoc.org/github.com/corvuscrypto/gpoll
 
 A basic example of starting a server is:
 
@@ -15,17 +15,22 @@ import  (
 
 func HandleMessage(w http.ResponseWriter, r *http.Request) {
 
-//code to detect message and do other stuff as you please with the request.
-
-//send the message ('msg'); type string
-gpoll.Send(msg)
+        /* code to detect message and do other stuff as 
+           you please with the request. */
+           
+        var msg string = "blah blah blah"
+           
+        gpoll.Send(msg) //send the message string
+        
+        w.WriteHeader(200)
+        
 }
 
 func main(){
 
-gpoll.ListenAndBroadcast("/path/to/listen/on")
-http.HandleFunc("/send", HandleMessage)
-http.ListenAndServe(":8080",nil)
+        gpoll.ListenAndBroadcast("/path/to/listen/on")
+        http.HandleFunc("/send", HandleMessage)
+        http.ListenAndServe(":8080",nil)
 
 }
 ```
@@ -36,7 +41,7 @@ If you are using this package, the one rule that keeps this server ticking is th
 `?client-id=x$xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
 
 ### Why?
-The gpoll package uses this to maintain its routines and retrieve the proper channels to listen for messages. If you send an improper id, then you will receive an Error 417 response. **To initiate a client properly so the server returns a uuid to use for subsequent polls, send the following query:**
+The gpoll package uses this to maintain its routines and retrieve the proper channels to listen for messages. If you send an improper id, then you will receive an Error 404 response. **To initiate a client properly so the server returns a uuid to use for subsequent polls, send the following query:**
 `?client-id=0`
 
 ##### if you're into the specifics...
